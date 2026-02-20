@@ -14,14 +14,17 @@ export const warehouseIndexer = {
 export const repoSubscriptionIndexer = {
   index: (wh: WarehouseExpanded, subscription: RepoSubscription) => {
     const warehouseIndex = warehouseIndexer.index(wh);
+    const alias =
+      subscription?.image?.alias || subscription?.git?.alias || subscription?.chart?.alias || '';
     const subscriptionRepoURL =
       subscription?.image?.repoURL ||
       subscription?.git?.repoURL ||
       subscription?.chart?.repoURL ||
       `${subscription?.subscription?.name}${subscription?.subscription?.subscriptionType}` ||
       'unknown';
+    const subscriptionId = alias ? `${subscriptionRepoURL}:${alias}` : subscriptionRepoURL;
 
-    return `subscription/${warehouseIndex}/${subscriptionRepoURL}`;
+    return `subscription/${warehouseIndex}/${subscriptionId}`;
   },
   is: (id: string) => id.startsWith('subscription/')
 };

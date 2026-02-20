@@ -17,17 +17,22 @@ import {
 import styles from './node-size-source-of-truth.module.less';
 
 export const SubscriptionNode = (props: { subscription: RepoSubscription }) => {
-  const { title, base, link, repoURL } = useMemo(() => {
+  const { title, base, link, repoURL, alias } = useMemo(() => {
     const repoURL =
       props.subscription?.git?.repoURL ||
       props.subscription?.chart?.repoURL ||
       props.subscription?.image?.repoURL ||
       '';
+    const alias =
+      props.subscription?.git?.alias ||
+      props.subscription?.chart?.alias ||
+      props.subscription?.image?.alias ||
+      '';
     const title = humanComprehendableArtifact(repoURL) || props.subscription.subscription?.name;
     const base = artifactBase(repoURL) || repoURL;
     const link = artifactURL(repoURL);
 
-    return { title, repoURL, base, link };
+    return { title, repoURL, base, link, alias };
   }, [props.subscription]);
 
   let icon: IconProp | null = faQuestion;
@@ -54,6 +59,12 @@ export const SubscriptionNode = (props: { subscription: RepoSubscription }) => {
       }
       variant='borderless'
     >
+      {!!alias && (
+        <Tag className='text-[9px] text-wrap' color='purple' bordered={false}>
+          {alias}
+        </Tag>
+      )}
+
       {!!repoURL && (
         <Link href={link} target='_blank'>
           <Tag className='text-[9px] text-wrap' color='blue' bordered={false}>

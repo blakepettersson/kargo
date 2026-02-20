@@ -375,8 +375,9 @@ const (
 )
 
 type artifactSubscription struct {
-	URL  string
-	Type artifactType
+	Alias string
+	URL   string
+	Type  artifactType
 }
 
 // validateFreightArtifacts checks that the artifacts in the Freight are all
@@ -396,20 +397,23 @@ func validateFreightArtifacts(
 	for _, repo := range warehouse.Spec.InternalSubscriptions {
 		if repo.Git != nil {
 			subscriptions[artifactSubscription{
-				URL:  urls.NormalizeGit(repo.Git.RepoURL),
-				Type: artifactTypeGit,
+				Alias: repo.Git.Alias,
+				URL:   urls.NormalizeGit(repo.Git.RepoURL),
+				Type:  artifactTypeGit,
 			}] = false
 		}
 		if repo.Image != nil {
 			subscriptions[artifactSubscription{
-				URL:  repo.Image.RepoURL,
-				Type: artifactTypeImage,
+				Alias: repo.Image.Alias,
+				URL:   repo.Image.RepoURL,
+				Type:  artifactTypeImage,
 			}] = false
 		}
 		if repo.Chart != nil {
 			subscriptions[artifactSubscription{
-				URL:  path.Join(urls.NormalizeChart(repo.Chart.RepoURL), repo.Chart.Name),
-				Type: artifactTypeChart,
+				Alias: repo.Chart.Alias,
+				URL:   path.Join(urls.NormalizeChart(repo.Chart.RepoURL), repo.Chart.Name),
+				Type:  artifactTypeChart,
 			}] = false
 		}
 	}
@@ -420,8 +424,9 @@ func validateFreightArtifacts(
 	// the number of times each subscription is found.
 	for _, commit := range freight.Commits {
 		sub := artifactSubscription{
-			URL:  urls.NormalizeGit(commit.RepoURL),
-			Type: artifactTypeGit,
+			Alias: commit.Alias,
+			URL:   urls.NormalizeGit(commit.RepoURL),
+			Type:  artifactTypeGit,
 		}
 		if _, ok := subscriptions[sub]; ok {
 			subscriptions[sub] = true
@@ -440,8 +445,9 @@ func validateFreightArtifacts(
 
 	for _, image := range freight.Images {
 		sub := artifactSubscription{
-			URL:  image.RepoURL,
-			Type: artifactTypeImage,
+			Alias: image.Alias,
+			URL:   image.RepoURL,
+			Type:  artifactTypeImage,
 		}
 		if _, ok := subscriptions[sub]; ok {
 			subscriptions[sub] = true
@@ -460,8 +466,9 @@ func validateFreightArtifacts(
 
 	for _, chart := range freight.Charts {
 		sub := artifactSubscription{
-			URL:  path.Join(urls.NormalizeChart(chart.RepoURL), chart.Name),
-			Type: artifactTypeChart,
+			Alias: chart.Alias,
+			URL:   path.Join(urls.NormalizeChart(chart.RepoURL), chart.Name),
+			Type:  artifactTypeChart,
 		}
 		if _, ok := subscriptions[sub]; ok {
 			subscriptions[sub] = true

@@ -94,6 +94,13 @@ spec:
             items:
               description: Chart describes a specific version of a Helm chart.
               properties:
+                alias:
+                  description: |-
+                    Alias is the alias of the Warehouse subscription that produced this
+                    artifact. This is only set when the subscription has an alias
+                    configured, which is used to disambiguate multiple subscriptions to
+                    the same repository.
+                  type: string
                 name:
                   description: Name specifies the name of the chart.
                   type: string
@@ -117,6 +124,13 @@ spec:
               description: GitCommit describes a specific commit from a specific Git
                 repository.
               properties:
+                alias:
+                  description: |-
+                    Alias is the alias of the Warehouse subscription that produced this
+                    artifact. This is only set when the subscription has an alias
+                    configured, which is used to disambiguate multiple subscriptions to
+                    the same repository.
+                  type: string
                 author:
                   description: Author is the author of the commit.
                   type: string
@@ -153,6 +167,13 @@ spec:
             items:
               description: Image describes a specific version of a container image.
               properties:
+                alias:
+                  description: |-
+                    Alias is the alias of the Warehouse subscription that produced this
+                    artifact. This is only set when the subscription has an alias
+                    configured, which is used to disambiguate multiple subscriptions to
+                    the same repository.
+                  type: string
                 annotations:
                   additionalProperties:
                     type: string

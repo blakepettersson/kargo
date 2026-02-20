@@ -4,6 +4,13 @@
  "description": "GitSubscription defines a subscription to a Git repository.",
  "type": "object",
  "properties": {
+  "alias": {
+   "type": "string",
+   "minLength": 1,
+   "maxLength": 253,
+   "pattern": "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$",
+   "description": "Alias is an optional identifier for this subscription. When specified, it must be unique within the Warehouse and is used as the uniqueness key instead of the repository URL. This enables multiple subscriptions to the same repository with different configurations (e.g. different tag filters). When two or more subscriptions of the same type share the same repository URL, all of them MUST have a unique alias."
+  },
   "repoURL": {
    "type": "string",
    "minLength": 1,

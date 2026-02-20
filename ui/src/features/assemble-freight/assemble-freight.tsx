@@ -68,13 +68,15 @@ const constructFreight = (
         repoURL: artifact.repoURL,
         tag: imageRef.tag,
         digest: imageRef.digest,
-        annotations: imageRef.annotations
+        annotations: imageRef.annotations,
+        alias: artifact.alias || ''
       } as Image);
     } else if ('versions' in artifact) {
       freight.charts.push({
         repoURL: artifact.repoURL,
         name: artifact.name,
-        version: info as string
+        version: info as string,
+        alias: artifact.alias || ''
       } as Chart);
     } else if ('commits' in artifact) {
       const commitRef = info as DiscoveredCommit;
@@ -85,7 +87,8 @@ const constructFreight = (
         branch: commitRef.branch,
         tag: commitRef.tag,
         author: commitRef.author,
-        committer: commitRef.committer
+        committer: commitRef.committer,
+        alias: artifact.alias || ''
       } as GitCommit);
     } else if ('artifactReferences' in artifact) {
       freight.artifacts.push(info as ArtifactReference);

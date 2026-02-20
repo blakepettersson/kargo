@@ -39,6 +39,12 @@ export const RepoSubscriptions = ({ subscriptions }: Props) => {
                 </Typography.Link>
               </Descriptions.Item>
 
+              {!!subscription?.chart?.alias && (
+                <Descriptions.Item label='alias' styles={{ label: DescriptionsLabelStyle }}>
+                  {subscription?.chart?.alias}
+                </Descriptions.Item>
+              )}
+
               {!!subscription?.chart?.discoveryLimit && (
                 <Descriptions.Item
                   label='discovery limit'
@@ -69,6 +75,12 @@ export const RepoSubscriptions = ({ subscriptions }: Props) => {
                   {subscription.git?.repoURL}
                 </Typography.Link>
               </Descriptions.Item>
+
+              {!!subscription?.git?.alias && (
+                <Descriptions.Item label='alias' styles={{ label: DescriptionsLabelStyle }}>
+                  {subscription?.git?.alias}
+                </Descriptions.Item>
+              )}
 
               {!!subscription?.git?.discoveryLimit && (
                 <Descriptions.Item
@@ -119,6 +131,12 @@ export const RepoSubscriptions = ({ subscriptions }: Props) => {
                   {subscription.image?.repoURL}
                 </Typography.Link>
               </Descriptions.Item>
+
+              {!!subscription?.image?.alias && (
+                <Descriptions.Item label='alias' styles={{ label: DescriptionsLabelStyle }}>
+                  {subscription?.image?.alias}
+                </Descriptions.Item>
+              )}
 
               {!!subscription?.image?.discoveryLimit && (
                 <Descriptions.Item

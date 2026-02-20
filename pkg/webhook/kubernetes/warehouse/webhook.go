@@ -280,66 +280,71 @@ func (s uniqueSubSet) addSub(
 	// A small bit of special-casing is required here because, unlike generic
 	// subscriptions, the original three subscription types do not have one common
 	// way to identify them uniquely.
+	//
+	// When an alias is present, it is appended to the normalized URL to form
+	// the uniqueness key. This allows multiple subscriptions to the same
+	// repository URL as long as they have different aliases.
+	var k subscriptionKey
 	switch {
 	case sub.Chart != nil:
-		k := subscriptionKey{
+		k = subscriptionKey{
 			kind: "chart",
 			id:   urls.NormalizeChart(sub.Chart.RepoURL),
 		}
 		isHTTP := strings.HasPrefix(sub.Chart.RepoURL, "http://") || strings.HasPrefix(sub.Chart.RepoURL, "https://")
 		if isHTTP {
-			// For classical HTTP(S) Helm chart repositories, the chart name is part
-			// of the uniqueness criteria
 			k.id = k.id + ":" + sub.Chart.Name
 		}
-		if _, exists := s[k]; exists {
+		k.id = k.id + ":" + sub.Chart.Alias
+		if existingPath, exists := s[k]; exists {
 			var errMsg string
 			if isHTTP {
 				errMsg = fmt.Sprintf(
 					"subscription for chart %q already exists at %q",
-					sub.Chart.Name, s[k],
+					sub.Chart.Name, existingPath,
 				)
 			} else {
-				errMsg = fmt.Sprintf("subscription for chart already exists at %q", s[k])
+				errMsg = fmt.Sprintf("subscription for chart already exists at %q", existingPath)
 			}
 			return field.Invalid(f.Child("chart"), sub.Chart.RepoURL, errMsg)
 		}
 	case sub.Git != nil:
-		k := subscriptionKey{
+		k = subscriptionKey{
 			kind: "git",
-			id:   urls.NormalizeGit(sub.Git.RepoURL),
+			id:   urls.NormalizeGit(sub.Git.RepoURL) + ":" + sub.Git.Alias,
 		}
-		if _, exists := s[k]; exists {
+		if existingPath, exists := s[k]; exists {
 			return field.Invalid(
 				f.Child("git"),
 				sub.Git.RepoURL,
-				fmt.Sprintf("subscription for Git repository already exists at %q", s[k]),
+				fmt.Sprintf("subscription for Git repository already exists at %q", existingPath),
 			)
 		}
 	case sub.Image != nil:
-		k := subscriptionKey{
+		k = subscriptionKey{
 			kind: "image",
-			id:   urls.NormalizeImage(sub.Image.RepoURL),
+			id:   urls.NormalizeImage(sub.Image.RepoURL) + ":" + sub.Image.Alias,
 		}
-		if _, exists := s[k]; exists {
+		if existingPath, exists := s[k]; exists {
 			return field.Invalid(
 				f.Child("image"),
 				sub.Image.RepoURL,
-				fmt.Sprintf("subscription for image repository already exists at %q", s[k]),
+				fmt.Sprintf("subscription for image repository already exists at %q", existingPath),
 			)
 		}
 	case sub.Subscription != nil:
-		k := subscriptionKey{
+		k = subscriptionKey{
 			kind: "sub",
 			id:   strings.TrimSpace(strings.ToLower(sub.Subscription.Name)),
 		}
-		if _, exists := s[k]; exists {
+		if existingPath, exists := s[k]; exists {
 			return field.Invalid(
 				f.Child("subscription"),
 				sub.Subscription.Name,
-				fmt.Sprintf("subscription with name %q already exists at %q", sub.Subscription.Name, s[k]),
+				fmt.Sprintf("subscription with name %q already exists at %q", sub.Subscription.Name, existingPath),
 			)
 		}
 	}
+	s[k] = f
 	return nil
 }

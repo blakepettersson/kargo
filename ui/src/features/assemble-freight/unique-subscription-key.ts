@@ -8,7 +8,12 @@ export const getSubscriptionKey = (res: DiscoveryResult) => {
   }
 
   if (res.$typeName === 'github.com.akuity.kargo.api.v1alpha1.ChartDiscoveryResult') {
-    return `${res.repoURL}/${res.name}`;
+    const base = `${res.repoURL}/${res.name}`;
+    return res.alias ? `${base}:${res.alias}` : base;
+  }
+
+  if ('alias' in res && res.alias) {
+    return `${res.repoURL}:${res.alias}`;
   }
 
   return res.repoURL;
@@ -16,7 +21,12 @@ export const getSubscriptionKey = (res: DiscoveryResult) => {
 
 export const getSubscriptionKeyFreight = (res: Image | Chart | GitCommit) => {
   if (res.$typeName === 'github.com.akuity.kargo.api.v1alpha1.Chart') {
-    return `${res.repoURL}/${res.name}`;
+    const base = `${res.repoURL}/${res.name}`;
+    return res.alias ? `${base}:${res.alias}` : base;
+  }
+
+  if ('alias' in res && res.alias) {
+    return `${res.repoURL}:${res.alias}`;
   }
 
   return res.repoURL;

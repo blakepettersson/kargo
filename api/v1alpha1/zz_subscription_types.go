@@ -25,6 +25,12 @@ type ChartSubscription struct {
 	// chart will always be used. Care should be taken with leaving this field unspecified, as
 	// it can lead to the unanticipated rollout of breaking changes.
 	SemverConstraint string `json:"semverConstraint,omitempty" protobuf:"bytes,4,opt,name=semverConstraint"`
+	// Alias is an optional identifier for this subscription. When specified, it must be unique
+	// within the Warehouse and is used as the uniqueness key instead of the repository URL.
+	// This enables multiple subscriptions to the same repository with different configurations
+	// (e.g. different tag filters). When two or more subscriptions of the same type share the
+	// same repository URL, all of them MUST have a unique alias.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,5,opt,name=alias"`
 }
 
 // GitSubscription defines a subscription to a Git repository.
@@ -78,6 +84,12 @@ type GitSubscription struct {
 	// "strict" semver tag contains ALL of major, minor, and patch version components. Only has
 	// effect when CommitSelectionStrategy is SemVer.
 	StrictSemvers *bool `json:"strictSemvers,omitempty" protobuf:"varint,14,opt,name=strictSemvers"`
+	// Alias is an optional identifier for this subscription. When specified, it must be unique
+	// within the Warehouse and is used as the uniqueness key instead of the repository URL.
+	// This enables multiple subscriptions to the same repository with different configurations
+	// (e.g. different tag filters). When two or more subscriptions of the same type share the
+	// same repository URL, all of them MUST have a unique alias.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,15,opt,name=alias"`
 }
 
 // ImageSubscription defines a subscription to a container image repository.
@@ -138,6 +150,12 @@ type ImageSubscription struct {
 	// with short Git commit hashes, which could be mistaken for a semver string containing the
 	// major version number only.
 	StrictSemvers *bool `json:"strictSemvers,omitempty" protobuf:"varint,12,opt,name=strictSemvers"`
+	// Alias is an optional identifier for this subscription. When specified, it must be unique
+	// within the Warehouse and is used as the uniqueness key instead of the repository URL.
+	// This enables multiple subscriptions to the same repository with different configurations
+	// (e.g. different tag filters). When two or more subscriptions of the same type share the
+	// same repository URL, all of them MUST have a unique alias.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,13,opt,name=alias"`
 }
 
 // CommitSelectionStrategy specifies the rules for how to identify the newest commit of

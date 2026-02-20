@@ -70,6 +70,11 @@ type GitCommit struct {
 	Author string `json:"author,omitempty" protobuf:"bytes,7,opt,name=author"`
 	// Committer is the person who committed the commit.
 	Committer string `json:"committer,omitempty" protobuf:"bytes,8,opt,name=committer"`
+	// Alias is the alias of the Warehouse subscription that produced this
+	// artifact. This is only set when the subscription has an alias
+	// configured, which is used to disambiguate multiple subscriptions to
+	// the same repository.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,9,opt,name=alias"`
 }
 
 // DeepEquals returns a bool indicating whether the receiver deep-equals the
@@ -87,7 +92,8 @@ func (g *GitCommit) DeepEquals(other *GitCommit) bool {
 		g.Tag == other.Tag &&
 		g.Message == other.Message &&
 		g.Author == other.Author &&
-		g.Committer == other.Committer
+		g.Committer == other.Committer &&
+		g.Alias == other.Alias
 }
 
 // Equals returns a bool indicating whether two GitCommits are equivalent.
@@ -99,7 +105,7 @@ func (g *GitCommit) Equals(rhs *GitCommit) bool {
 		return false
 	}
 	// If we get to here, both operands are non-nil
-	return g.RepoURL == rhs.RepoURL && g.ID == rhs.ID
+	return g.RepoURL == rhs.RepoURL && g.ID == rhs.ID && g.Alias == rhs.Alias
 }
 
 // FreightStatus describes a piece of Freight's most recently observed state.

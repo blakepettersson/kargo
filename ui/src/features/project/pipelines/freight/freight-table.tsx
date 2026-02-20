@@ -7,7 +7,10 @@ import classNames from 'classnames';
 import { useMemo } from 'react';
 
 import { ArtifactMetadata } from '@ui/features/freight/artifact-metadata';
-import { flattenFreightOrigin } from '@ui/features/freight/flatten-freight-origin-utils';
+import {
+  TableSource,
+  flattenFreightOrigin
+} from '@ui/features/freight/flatten-freight-origin-utils';
 import { Freight } from '@ui/gen/api/v1alpha1/generated_pb';
 
 type FreightTableProps = {
@@ -17,6 +20,10 @@ type FreightTableProps = {
 
 export const FreightTable = (props: FreightTableProps) => {
   const freightSource = useMemo(() => flattenFreightOrigin(props.freight), [props.freight]);
+  const hasAliases = useMemo(
+    () => freightSource?.some((r) => 'alias' in r && r.alias),
+    [freightSource]
+  );
 
   return (
     <>
@@ -61,6 +68,16 @@ export const FreightTable = (props: FreightTableProps) => {
                 return record.repoURL;
               }
             },
+            ...(hasAliases
+              ? [
+                  {
+                    title: 'Alias',
+                    width: '10%',
+                    render: (_: unknown, record: TableSource) =>
+                      ('alias' in record && record.alias) || '-'
+                  }
+                ]
+              : []),
             {
               title: 'Version',
               render: (_, record) => {

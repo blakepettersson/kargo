@@ -219,6 +219,10 @@
               "items": {
                 "description": "Chart describes a specific version of a Helm chart.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                    "type": "string"
+                  },
                   "name": {
                     "description": "Name specifies the name of the chart.",
                     "type": "string"
@@ -241,6 +245,10 @@
               "items": {
                 "description": "GitCommit describes a specific commit from a specific Git repository.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                    "type": "string"
+                  },
                   "author": {
                     "description": "Author is the author of the commit.",
                     "type": "string"
@@ -279,6 +287,10 @@
               "items": {
                 "description": "Image describes a specific version of a container image.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                    "type": "string"
+                  },
                   "annotations": {
                     "additionalProperties": {
                       "type": "string"
@@ -380,6 +392,10 @@
                     "items": {
                       "description": "Chart describes a specific version of a Helm chart.",
                       "properties": {
+                        "alias": {
+                          "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                          "type": "string"
+                        },
                         "name": {
                           "description": "Name specifies the name of the chart.",
                           "type": "string"
@@ -402,6 +418,10 @@
                     "items": {
                       "description": "GitCommit describes a specific commit from a specific Git repository.",
                       "properties": {
+                        "alias": {
+                          "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                          "type": "string"
+                        },
                         "author": {
                           "description": "Author is the author of the commit.",
                           "type": "string"
@@ -440,6 +460,10 @@
                     "items": {
                       "description": "Image describes a specific version of a container image.",
                       "properties": {
+                        "alias": {
+                          "description": "Alias is the alias of the Warehouse subscription that produced this\nartifact. This is only set when the subscription has an alias\nconfigured, which is used to disambiguate multiple subscriptions to\nthe same repository.",
+                          "type": "string"
+                        },
                         "annotations": {
                           "additionalProperties": {
                             "type": "string"

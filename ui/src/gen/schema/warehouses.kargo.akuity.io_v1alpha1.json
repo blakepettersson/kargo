@@ -131,6 +131,10 @@
               "items": {
                 "description": "ChartDiscoveryResult represents the result of a chart discovery operation for\na ChartSubscription.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the ChartSubscription that produced this result,\nif one was specified.",
+                    "type": "string"
+                  },
                   "name": {
                     "description": "Name is the name of the Helm chart, as specified in the ChartSubscription.",
                     "type": "string"
@@ -169,6 +173,10 @@
               "items": {
                 "description": "GitDiscoveryResult represents the result of a Git discovery operation for a\nGitSubscription.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the GitSubscription that produced this result, if\none was specified.",
+                    "type": "string"
+                  },
                   "commits": {
                     "description": "Commits is a list of commits discovered by the Warehouse for the\nGitSubscription. An empty list indicates that the discovery operation was\nsuccessful, but no commits matching the GitSubscription criteria were found.",
                     "items": {
@@ -228,6 +236,10 @@
               "items": {
                 "description": "ImageDiscoveryResult represents the result of an image discovery operation\nfor an ImageSubscription.",
                 "properties": {
+                  "alias": {
+                    "description": "Alias is the alias of the ImageSubscription that produced this result,\nif one was specified.",
+                    "type": "string"
+                  },
                   "platform": {
                     "description": "Platform is the target platform constraint of the ImageSubscription\nfor which references were discovered. This field is optional, and\nonly populated if the ImageSubscription specifies a Platform.",
                     "type": "string"

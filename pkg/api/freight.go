@@ -44,17 +44,20 @@ func GenerateFreightID(f *kargoapi.Freight) string {
 // chartHashPart returns a string that uniquely identifies a specific version of
 // a specific Helm chart.
 func chartHashPart(chart kargoapi.Chart) string {
-	return fmt.Sprintf(
-		"%s:%s",
-		// path.Join accounts for the possibility that chart.Name is empty
-		path.Join(urls.NormalizeChart(chart.RepoURL), chart.Name),
-		chart.Version,
-	)
+	prefix := path.Join(urls.NormalizeChart(chart.RepoURL), chart.Name)
+	if chart.Alias != "" {
+		prefix = chart.Alias + ":" + prefix
+	}
+	return fmt.Sprintf("%s:%s", prefix, chart.Version)
 }
 
 // commitHashPart returns a string that uniquely identifies a specific commit
 // from a specific Git repository.
 func commitHashPart(commit kargoapi.GitCommit) string {
+	prefix := urls.NormalizeGit(commit.RepoURL)
+	if commit.Alias != "" {
+		prefix = commit.Alias + ":" + prefix
+	}
 	if commit.Tag != "" {
 		// If we have a tag, incorporate it into the canonical representation of a
 		// commit used when calculating Freight ID. This is necessary because one
@@ -63,12 +66,9 @@ func commitHashPart(commit kargoapi.GitCommit) string {
 		// Later, that same commit is tagged as v1.0.0. If we don't incorporate
 		// the tag into the ID, we will never produce a new/distinct piece of
 		// Freight for the new tag.
-		return fmt.Sprintf(
-			"%s:%s:%s",
-			urls.NormalizeGit(commit.RepoURL), commit.Tag, commit.ID,
-		)
+		return fmt.Sprintf("%s:%s:%s", prefix, commit.Tag, commit.ID)
 	}
-	return fmt.Sprintf("%s:%s", urls.NormalizeGit(commit.RepoURL), commit.ID)
+	return fmt.Sprintf("%s:%s", prefix, commit.ID)
 }
 
 // imageHashPart returns a string that uniquely identifies a specific revision\
@@ -81,7 +81,11 @@ func imageHashPart(img kargoapi.Image) string {
 	// is already known, but has been re-tagged. To cover both cases, we
 	// incorporate BOTH tag and digest into the canonical representation of an
 	// image used when calculating Freight ID.
-	return fmt.Sprintf("%s:%s@%s", img.RepoURL, img.Tag, img.Digest)
+	prefix := img.RepoURL
+	if img.Alias != "" {
+		prefix = img.Alias + ":" + prefix
+	}
+	return fmt.Sprintf("%s:%s@%s", prefix, img.Tag, img.Digest)
 }
 
 // artifactHashPart returns a string that uniquely identifies a specific

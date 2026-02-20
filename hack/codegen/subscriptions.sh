@@ -31,6 +31,15 @@ sed -i.bak 's/Digest[[:space:]]*ImageSelectionStrategy/ImageSelectionStrategyDig
 sed -i.bak 's/NewestBuild[[:space:]]*ImageSelectionStrategy/ImageSelectionStrategyNewestBuild ImageSelectionStrategy/' ${out_file}
 sed -i.bak 's/CacheByTag[[:space:]]*\*bool/CacheByTag bool/' ${out_file}
 sed -i.bak 's/InsecureSkipTLSVerify[[:space:]]*\*bool/InsecureSkipTLSVerify bool/' ${out_file}
+# Move the Alias field (comment + declaration) to the end of each struct so
+# go-to-protobuf assigns existing fields their original numbers and Alias
+# gets the next available number without shifting anything.
+awk '
+/\/\/ Alias is an optional/ { alias_block = $0 "\n"; in_alias = 1; next }
+in_alias { alias_block = alias_block $0 "\n"; if (/Alias[[:space:]]+string/) in_alias = 0; next }
+/^}/ && alias_block != "" { printf "%s", alias_block; alias_block = ""; print; next }
+{ print }
+' ${out_file} > ${out_file}.tmp && mv ${out_file}.tmp ${out_file}
 
 rm ${out_file}.bak
 

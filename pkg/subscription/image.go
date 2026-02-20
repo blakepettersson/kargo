@@ -304,5 +304,6 @@ func (i *imageSubscriber) DiscoverArtifacts(
 		RepoURL:    imgSub.RepoURL,
 		Platform:   imgSub.Platform,
 		References: images,
+		Alias:      imgSub.Alias,
 	}, nil
 }

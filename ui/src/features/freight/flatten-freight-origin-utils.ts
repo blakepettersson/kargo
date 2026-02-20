@@ -5,6 +5,7 @@ export type TableSource =
       type: 'image';
       repoURL: string;
       tag?: string;
+      alias?: string;
       annotations?: Record<string, string>;
     }
   | {
@@ -16,11 +17,13 @@ export type TableSource =
       author: string;
       committer: string;
       tag?: string;
+      alias?: string;
     }
   | {
       type: 'helm';
       repoURL: string;
       version: string;
+      alias?: string;
     }
   | ({
       type: 'other';
@@ -32,6 +35,7 @@ export const flattenFreightOrigin = (freight: Freight): TableSource[] => {
       type: 'image',
       repoURL: image?.repoURL,
       tag: image?.tag,
+      alias: image?.alias || undefined,
       annotations: image?.annotations
     })) || [];
 
@@ -43,13 +47,15 @@ export const flattenFreightOrigin = (freight: Freight): TableSource[] => {
     committer: commit?.committer,
     id: commit?.id,
     message: commit?.message,
-    tag: commit?.tag
+    tag: commit?.tag,
+    alias: commit?.alias || undefined
   }));
 
   const helm: TableSource[] = freight?.charts?.map((chart) => ({
     type: 'helm',
     repoURL: chart?.repoURL,
-    version: chart?.version
+    version: chart?.version,
+    alias: chart?.alias || undefined
   }));
 
   const other: TableSource[] = freight?.artifacts?.map((otherArtifact) => ({

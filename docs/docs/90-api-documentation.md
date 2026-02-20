@@ -1843,6 +1843,7 @@ RawFormat specifies the format for raw resource representation.
 | repoURL | [string](#string) |  RepoURL specifies the URL of a Helm chart repository. Classic chart repositories (using HTTP/S) can contain differently named charts. When this field points to such a repository, the Name field will specify the name of the chart within the repository. In the case of a repository within an OCI registry, the URL implicitly points to a specific chart and the Name field will be empty. |
 | name | [string](#string) |  Name specifies the name of the chart. |
 | version | [string](#string) |  Version specifies a particular version of the chart. |
+| alias | [string](#string) |  Alias is the alias of the Warehouse subscription that produced this artifact. This is only set when the subscription has an alias configured, which is used to disambiguate multiple subscriptions to the same repository. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-ChartDiscoveryResult"></a>
 
@@ -1854,6 +1855,7 @@ RawFormat specifies the format for raw resource representation.
 | name | [string](#string) |  Name is the name of the Helm chart, as specified in the ChartSubscription. |
 | semverConstraint | [string](#string) |  SemverConstraint is the constraint for which versions were discovered. This field is optional, and only populated if the ChartSubscription specifies a SemverConstraint. |
 | versions | [string](#string) |  Versions is a list of versions discovered by the Warehouse for the ChartSubscription. An empty list indicates that the discovery operation was successful, but no versions matching the ChartSubscription criteria were found.  +optional |
+| alias | [string](#string) |  Alias is the alias of the ChartSubscription that produced this result, if one was specified. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-ChartSubscription"></a>
 
@@ -1865,6 +1867,7 @@ RawFormat specifies the format for raw resource representation.
 | name | [string](#string) |  Name specifies the name of a Helm chart to subscribe to within a classic chart repository specified by the repoURL field. This field is required when the repoURL field points to a classic chart repository and MUST otherwise be empty. |
 | repoURL | [string](#string) |  RepoURL specifies the URL of a Helm chart repository. It may be a classic chart repository (using HTTP/S) OR a repository within an OCI registry. Classic chart repositories can contain differently named charts. When this field points to such a repository, the name field MUST also be used to specify the name of the desired chart within that repository. In the case of a repository within an OCI registry, the URL implicitly points to a specific chart and the name field MUST NOT be used. This field is required. |
 | semverConstraint | [string](#string) |  SemverConstraint specifies constraints on what new chart versions are permissible. When left unspecified, there will be no constraints, which means the latest version of the chart will always be used. Care should be taken with leaving this field unspecified, as it can lead to the unanticipated rollout of breaking changes. |
+| alias | [string](#string) |  Alias is an optional identifier for this subscription. When specified, it must be unique within the Warehouse and is used as the uniqueness key instead of the repository URL. This enables multiple subscriptions to the same repository with different configurations (e.g. different tag filters). When two or more subscriptions of the same type share the same repository URL, all of them MUST have a unique alias. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-ClusterConfig"></a>
 
@@ -2196,6 +2199,7 @@ RawFormat specifies the format for raw resource representation.
 | message | [string](#string) |  Message is the message associated with the commit. At present, this only contains the first line (subject) of the commit message. |
 | author | [string](#string) |  Author is the author of the commit. |
 | committer | [string](#string) |  Committer is the person who committed the commit. |
+| alias | [string](#string) |  Alias is the alias of the Warehouse subscription that produced this artifact. This is only set when the subscription has an alias configured, which is used to disambiguate multiple subscriptions to the same repository. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-GitDiscoveryResult"></a>
 
@@ -2205,6 +2209,7 @@ RawFormat specifies the format for raw resource representation.
 | ----- | ---- | ----------- |
 | repoURL | [string](#string) |  RepoURL is the repository URL of the GitSubscription.     |
 | commits | [DiscoveredCommit](#github-com-akuity-kargo-api-v1alpha1-DiscoveredCommit) |  Commits is a list of commits discovered by the Warehouse for the GitSubscription. An empty list indicates that the discovery operation was successful, but no commits matching the GitSubscription criteria were found.  +optional |
+| alias | [string](#string) |  Alias is the alias of the GitSubscription that produced this result, if one was specified. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-GitHubWebhookReceiverConfig"></a>
 
@@ -2242,6 +2247,7 @@ RawFormat specifies the format for raw resource representation.
 | repoURL | [string](#string) |  URL is the repository's URL. This is a required field. |
 | semverConstraint | [string](#string) |  SemverConstraint specifies constraints on what new tagged commits are considered in determining the newest commit of interest. Only has effect when CommitSelectionStrategy is SemVer. |
 | strictSemvers | [bool](#bool) |  StrictSemvers specifies whether only "strict" semver tags should be considered. A "strict" semver tag contains ALL of major, minor, and patch version components. Only has effect when CommitSelectionStrategy is SemVer. |
+| alias | [string](#string) |  Alias is an optional identifier for this subscription. When specified, it must be unique within the Warehouse and is used as the uniqueness key instead of the repository URL. This enables multiple subscriptions to the same repository with different configurations (e.g. different tag filters). When two or more subscriptions of the same type share the same repository URL, all of them MUST have a unique alias. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-GiteaWebhookReceiverConfig"></a>
 
@@ -2297,6 +2303,7 @@ RawFormat specifies the format for raw resource representation.
 | tag | [string](#string) |  Tag identifies a specific version of the image in the repository specified by RepoURL. |
 | digest | [string](#string) |  Digest identifies a specific version of the image in the repository specified by RepoURL. This is a more precise identifier than Tag. |
 | annotations | [Image.AnnotationsEntry](#github-com-akuity-kargo-api-v1alpha1-Image-AnnotationsEntry) |  Annotations is a map of arbitrary metadata for the image. |
+| alias | [string](#string) |  Alias is the alias of the Warehouse subscription that produced this artifact. This is only set when the subscription has an alias configured, which is used to disambiguate multiple subscriptions to the same repository. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-Image-AnnotationsEntry"></a>
 
@@ -2316,6 +2323,7 @@ RawFormat specifies the format for raw resource representation.
 | repoURL | [string](#string) |  RepoURL is the repository URL of the image, as specified in the ImageSubscription.   |
 | platform | [string](#string) |  Platform is the target platform constraint of the ImageSubscription for which references were discovered. This field is optional, and only populated if the ImageSubscription specifies a Platform. |
 | references | [DiscoveredImageReference](#github-com-akuity-kargo-api-v1alpha1-DiscoveredImageReference) |  References is a list of image references discovered by the Warehouse for the ImageSubscription. An empty list indicates that the discovery operation was successful, but no images matching the ImageSubscription criteria were found.  +optional |
+| alias | [string](#string) |  Alias is the alias of the ImageSubscription that produced this result, if one was specified. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-ImageSubscription"></a>
 
@@ -2335,6 +2343,7 @@ RawFormat specifies the format for raw resource representation.
 | platform | [string](#string) |  Platform is a string of the form &lt;os&gt;/&lt;arch&gt; that limits the tags that can be considered when searching for new versions of an image. This field is optional. When left unspecified, it is implicitly equivalent to the OS/architecture of the Kargo controller. Care should be taken to set this value correctly in cases where the image will run on a Kubernetes node with a different OS/architecture than the Kargo controller. |
 | repoURL | [string](#string) |  RepoURL specifies the URL of the image repository to subscribe to. The value in this field MUST NOT include an image tag. This field is required. |
 | strictSemvers | [bool](#bool) |  StrictSemvers specifies whether only "strict" semver tags should be considered. A "strict" semver tag is one containing ALL of major, minor, and patch version components. This is enabled by default, but only has any effect when the ImageSelectionStrategy is SemVer. This should be disabled cautiously, as it is not uncommon to tag container images with short Git commit hashes, which could be mistaken for a semver string containing the major version number only. |
+| alias | [string](#string) |  Alias is an optional identifier for this subscription. When specified, it must be unique within the Warehouse and is used as the uniqueness key instead of the repository URL. This enables multiple subscriptions to the same repository with different configurations (e.g. different tag filters). When two or more subscriptions of the same type share the same repository URL, all of them MUST have a unique alias. |
 
 <a name="github-com-akuity-kargo-api-v1alpha1-IndexSelector"></a>
 

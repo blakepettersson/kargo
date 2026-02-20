@@ -406,6 +406,9 @@ type GitDiscoveryResult struct {
 	//
 	// +optional
 	Commits []DiscoveredCommit `json:"commits" protobuf:"bytes,2,rep,name=commits"`
+	// Alias is the alias of the GitSubscription that produced this result, if
+	// one was specified.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,3,opt,name=alias"`
 }
 
 // DiscoveredCommit represents a commit discovered by a Warehouse for a
@@ -453,6 +456,9 @@ type ImageDiscoveryResult struct {
 	//
 	// +optional
 	References []DiscoveredImageReference `json:"references" protobuf:"bytes,3,rep,name=references"`
+	// Alias is the alias of the ImageSubscription that produced this result,
+	// if one was specified.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,4,opt,name=alias"`
 }
 
 // DiscoveredImageReference represents an image reference discovered by a
@@ -500,6 +506,9 @@ type ChartDiscoveryResult struct {
 	//
 	// +optional
 	Versions []string `json:"versions" protobuf:"bytes,4,rep,name=versions"`
+	// Alias is the alias of the ChartSubscription that produced this result,
+	// if one was specified.
+	Alias string `json:"alias,omitempty" protobuf:"bytes,5,opt,name=alias"`
 }
 
 // DiscoveryResult represents the result of an artifact discovery operation for

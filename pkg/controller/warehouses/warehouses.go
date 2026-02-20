@@ -587,6 +587,7 @@ func (r *reconciler) buildFreightFromLatestArtifacts(
 			Message:   latestCommit.Subject,
 			Author:    latestCommit.Author,
 			Committer: latestCommit.Committer,
+			Alias:     result.Alias,
 		})
 	}
 
@@ -600,6 +601,7 @@ func (r *reconciler) buildFreightFromLatestArtifacts(
 			Tag:         latestImage.Tag,
 			Digest:      latestImage.Digest,
 			Annotations: latestImage.Annotations,
+			Alias:       result.Alias,
 		})
 	}
 
@@ -616,6 +618,7 @@ func (r *reconciler) buildFreightFromLatestArtifacts(
 			RepoURL: result.RepoURL,
 			Name:    result.Name,
 			Version: latestChart,
+			Alias:   result.Alias,
 		})
 	}
 

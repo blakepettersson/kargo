@@ -246,6 +246,7 @@ func TestFindCommit(t *testing.T) {
 				testCase.desiredOrigin,
 				testCase.freight,
 				testRepoURL,
+				"",
 			)
 			testCase.assertions(t, commit, err)
 		})
@@ -479,7 +480,8 @@ func TestFindImage(t *testing.T) {
 				testCase.stage.Spec.RequestedFreight,
 				testCase.desiredOrigin,
 				testCase.freight,
-				testRepoURL)
+				testRepoURL,
+				"")
 			testCase.assertions(t, image, err)
 		})
 	}
@@ -849,6 +851,7 @@ func TestFindChart(t *testing.T) {
 				testCase.freight,
 				testRepoURL,
 				testChartName,
+				"",
 			)
 			testCase.assertions(t, chart, err)
 		})

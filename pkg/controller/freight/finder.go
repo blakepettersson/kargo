@@ -28,6 +28,7 @@ func FindCommit(
 	desiredOrigin *kargoapi.FreightOrigin,
 	freight []kargoapi.FreightReference,
 	repoURL string,
+	alias string,
 ) (*kargoapi.GitCommit, error) {
 	repoURL = urls.NormalizeGit(repoURL)
 	// If no origin was explicitly identified, we need to look at all possible
@@ -59,7 +60,9 @@ func FindCommit(
 				)
 			}
 			for _, sub := range warehouse.Spec.InternalSubscriptions {
-				if sub.Git != nil && urls.NormalizeGit(sub.Git.RepoURL) == repoURL {
+				if sub.Git != nil &&
+					urls.NormalizeGit(sub.Git.RepoURL) == repoURL &&
+					(alias == "" || sub.Git.Alias == alias) {
 					if desiredOrigin != nil {
 						return nil, fmt.Errorf(
 							"multiple requested Freight could potentially provide a "+
@@ -82,7 +85,7 @@ func FindCommit(
 		if f.Origin.Equals(desiredOrigin) {
 			for j := range f.Commits {
 				c := &f.Commits[j]
-				if urls.NormalizeGit(c.RepoURL) == repoURL {
+				if urls.NormalizeGit(c.RepoURL) == repoURL && (alias == "" || c.Alias == alias) {
 					return c, nil
 				}
 			}
@@ -102,6 +105,7 @@ func FindImage(
 	desiredOrigin *kargoapi.FreightOrigin,
 	freight []kargoapi.FreightReference,
 	repoURL string,
+	alias string,
 ) (*kargoapi.Image, error) {
 	// If no origin was explicitly identified, we need to look at all possible
 	// origins. If there's only one that could provide the commit we're looking
@@ -129,7 +133,9 @@ func FindImage(
 				)
 			}
 			for _, sub := range warehouse.Spec.InternalSubscriptions {
-				if sub.Image != nil && sub.Image.RepoURL == repoURL {
+				if sub.Image != nil &&
+					sub.Image.RepoURL == repoURL &&
+					(alias == "" || sub.Image.Alias == alias) {
 					if desiredOrigin != nil {
 						return nil, fmt.Errorf(
 							"multiple requested Freight could potentially provide a container image from "+
@@ -151,7 +157,7 @@ func FindImage(
 	for _, f := range freight {
 		if f.Origin.Equals(desiredOrigin) {
 			for _, i := range f.Images {
-				if i.RepoURL == repoURL {
+				if i.RepoURL == repoURL && (alias == "" || i.Alias == alias) {
 					return &i, nil
 				}
 			}
@@ -170,7 +176,11 @@ func HasAmbiguousImageRequest(
 	project string,
 	freightReqs []kargoapi.FreightRequest,
 ) (bool, error) {
-	var subscribedRepositories = make(map[string]any)
+	type imageSubKey struct {
+		repoURL string
+		alias   string
+	}
+	subscribedRepositories := make(map[imageSubKey]any)
 
 	for i := range freightReqs {
 		requestedFreight := freightReqs[i]
@@ -195,13 +205,14 @@ func HasAmbiguousImageRequest(
 
 		for _, sub := range warehouse.Spec.InternalSubscriptions {
 			if sub.Image != nil {
-				if _, ok := subscribedRepositories[sub.Image.RepoURL]; ok {
+				key := imageSubKey{repoURL: sub.Image.RepoURL, alias: sub.Image.Alias}
+				if _, ok := subscribedRepositories[key]; ok {
 					return true, fmt.Errorf(
 						"multiple requested Freight could potentially provide a container image from repository %s",
 						sub.Image.RepoURL,
 					)
 				}
-				subscribedRepositories[sub.Image.RepoURL] = struct{}{}
+				subscribedRepositories[key] = struct{}{}
 			}
 		}
 	}
@@ -218,6 +229,7 @@ func FindChart(
 	freight []kargoapi.FreightReference,
 	repoURL string,
 	chartName string,
+	alias string,
 ) (*kargoapi.Chart, error) {
 	// If no origin was explicitly identified, we need to look at all possible
 	// origins. If there's only one that could provide the commit we're looking
@@ -245,7 +257,10 @@ func FindChart(
 				)
 			}
 			for _, sub := range warehouse.Spec.InternalSubscriptions {
-				if sub.Chart != nil && sub.Chart.RepoURL == repoURL && sub.Chart.Name == chartName {
+				if sub.Chart != nil &&
+					sub.Chart.RepoURL == repoURL &&
+					sub.Chart.Name == chartName &&
+					(alias == "" || sub.Chart.Alias == alias) {
 					if desiredOrigin != nil {
 						return nil, fmt.Errorf(
 							"multiple requested Freight could potentially provide a chart from "+
@@ -273,7 +288,7 @@ func FindChart(
 	for _, f := range freight {
 		if f.Origin.Equals(desiredOrigin) {
 			for _, c := range f.Charts {
-				if c.RepoURL == repoURL && c.Name == chartName {
+				if c.RepoURL == repoURL && c.Name == chartName && (alias == "" || c.Alias == alias) {
 					return &c, nil
 				}
 			}

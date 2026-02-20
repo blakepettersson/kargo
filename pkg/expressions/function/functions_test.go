@@ -182,15 +182,15 @@ func Test_getCommitFromFreight(t *testing.T) {
 			name: "no arguments",
 			args: []any{},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-2 arguments")
+				assert.ErrorContains(t, err, "expected 1-3 arguments")
 				assert.Nil(t, result)
 			},
 		},
 		{
 			name: "too many arguments",
-			args: []any{"https://github.com/example/repo", kargoapi.FreightOrigin{}, "extra"},
+			args: []any{"https://github.com/example/repo", kargoapi.FreightOrigin{}, "extra", "extra2"},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-2 arguments")
+				assert.ErrorContains(t, err, "expected 1-3 arguments")
 				assert.Nil(t, result)
 			},
 		},
@@ -204,9 +204,9 @@ func Test_getCommitFromFreight(t *testing.T) {
 		},
 		{
 			name: "invalid second argument type",
-			args: []any{"https://github.com/example/repo", "invalid"},
+			args: []any{"https://github.com/example/repo", 123},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "second argument must be FreightOrigin")
+				assert.ErrorContains(t, err, "unexpected argument type")
 				assert.Nil(t, result)
 			},
 		},
@@ -244,10 +244,10 @@ func Test_getCommitFromDiscoveredArtifacts(t *testing.T) {
 	}{
 		{
 			name: "wrong number of args",
-			args: []any{"one", "two"},
+			args: []any{"one", "two", "three"},
 			assertions: func(t *testing.T, result any, err error) {
 				require.Nil(t, result)
-				require.ErrorContains(t, err, "expected 1 argument, got 2")
+				require.ErrorContains(t, err, "expected 1-2 arguments, got 3")
 			},
 		},
 		{
@@ -416,15 +416,15 @@ func Test_getImageFromFreight(t *testing.T) {
 			name: "no arguments",
 			args: []any{},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-2 arguments")
+				assert.ErrorContains(t, err, "expected 1-3 arguments")
 				assert.Nil(t, result)
 			},
 		},
 		{
 			name: "too many arguments",
-			args: []any{"registry.example.com/app", kargoapi.FreightOrigin{}, "extra"},
+			args: []any{"registry.example.com/app", kargoapi.FreightOrigin{}, "extra", "extra2"},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-2 arguments")
+				assert.ErrorContains(t, err, "expected 1-3 arguments")
 				assert.Nil(t, result)
 			},
 		},
@@ -438,9 +438,9 @@ func Test_getImageFromFreight(t *testing.T) {
 		},
 		{
 			name: "invalid second argument type",
-			args: []any{"registry.example.com/app", "invalid"},
+			args: []any{"registry.example.com/app", 123},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "second argument must be FreightOrigin")
+				assert.ErrorContains(t, err, "unexpected argument type")
 				assert.Nil(t, result)
 			},
 		},
@@ -478,10 +478,10 @@ func Test_getImageFromDiscoveredArtifacts(t *testing.T) {
 	}{
 		{
 			name: "wrong number of args",
-			args: []any{"one", "two"},
+			args: []any{"one", "two", "three"},
 			assertions: func(t *testing.T, result any, err error) {
 				require.Nil(t, result)
-				require.ErrorContains(t, err, "expected 1 argument, got 2")
+				require.ErrorContains(t, err, "expected 1-2 arguments, got 3")
 			},
 		},
 		{
@@ -727,15 +727,15 @@ func Test_getChartFromFreight(t *testing.T) {
 			name: "no arguments",
 			args: []any{},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-3 arguments")
+				assert.ErrorContains(t, err, "expected 1-4 arguments")
 				assert.Nil(t, result)
 			},
 		},
 		{
 			name: "too many arguments",
-			args: []any{"url", "name", kargoapi.FreightOrigin{}, "extra"},
+			args: []any{"url", "name", kargoapi.FreightOrigin{}, "alias", "extra"},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "expected 1-3 arguments")
+				assert.ErrorContains(t, err, "expected 1-4 arguments")
 				assert.Nil(t, result)
 			},
 		},
@@ -751,23 +751,23 @@ func Test_getChartFromFreight(t *testing.T) {
 			name: "invalid second argument type",
 			args: []any{"https://charts.example.com", 123},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "second argument must be string or FreightOrigin")
+				assert.ErrorContains(t, err, "unexpected argument type")
 				assert.Nil(t, result)
 			},
 		},
 		{
 			name: "invalid third argument with string second argument",
-			args: []any{"https://charts.example.com", "fake-chart", "invalid"},
+			args: []any{"https://charts.example.com", "fake-chart", 123},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "third argument must be FreightOrigin")
+				assert.ErrorContains(t, err, "unexpected argument type")
 				assert.Nil(t, result)
 			},
 		},
 		{
 			name: "invalid third argument with origin second argument",
-			args: []any{"https://charts.example.com", kargoapi.FreightOrigin{}, "invalid"},
+			args: []any{"https://charts.example.com", "name", "alias", "extra-string"},
 			assertions: func(t *testing.T, result any, err error) {
-				assert.ErrorContains(t, err, "when using three arguments, second argument must be string")
+				assert.ErrorContains(t, err, "too many string arguments")
 				assert.Nil(t, result)
 			},
 		},
@@ -808,7 +808,7 @@ func Test_getChartFromDiscoveredArtifacts(t *testing.T) {
 			args: []any{},
 			assertions: func(t *testing.T, result any, err error) {
 				require.Nil(t, result)
-				require.ErrorContains(t, err, "expected 1-2 arguments, got 0")
+				require.ErrorContains(t, err, "expected 1-3 arguments, got 0")
 			},
 		},
 		{
@@ -824,7 +824,7 @@ func Test_getChartFromDiscoveredArtifacts(t *testing.T) {
 			args: []any{"oci://ghcr.io/akuity/kargo-charts/kargo", 2},
 			assertions: func(t *testing.T, result any, err error) {
 				require.Nil(t, result)
-				require.ErrorContains(t, err, "second argument must be string, got int")
+				require.ErrorContains(t, err, "argument 2 must be string, got int")
 			},
 		},
 		{

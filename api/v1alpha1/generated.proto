@@ -260,6 +260,12 @@ message Chart {
 
   // Version specifies a particular version of the chart.
   optional string version = 3;
+
+  // Alias is the alias of the Warehouse subscription that produced this
+  // artifact. This is only set when the subscription has an alias
+  // configured, which is used to disambiguate multiple subscriptions to
+  // the same repository.
+  optional string alias = 4;
 }
 
 // ChartDiscoveryResult represents the result of a chart discovery operation for
@@ -286,6 +292,10 @@ message ChartDiscoveryResult {
   //
   // +optional
   repeated string versions = 4;
+
+  // Alias is the alias of the ChartSubscription that produced this result,
+  // if one was specified.
+  optional string alias = 5;
 }
 
 // ChartSubscription defines a subscription to a Helm chart repository.
@@ -314,6 +324,13 @@ message ChartSubscription {
   // chart will always be used. Care should be taken with leaving this field unspecified, as
   // it can lead to the unanticipated rollout of breaking changes.
   optional string semverConstraint = 4;
+
+  // Alias is an optional identifier for this subscription. When specified, it must be unique
+  // within the Warehouse and is used as the uniqueness key instead of the repository URL.
+  // This enables multiple subscriptions to the same repository with different configurations
+  // (e.g. different tag filters). When two or more subscriptions of the same type share the
+  // same repository URL, all of them MUST have a unique alias.
+  optional string alias = 5;
 }
 
 // ClusterConfig is a resource type that describes cluster-level Kargo
@@ -844,6 +861,12 @@ message GitCommit {
 
   // Committer is the person who committed the commit.
   optional string committer = 8;
+
+  // Alias is the alias of the Warehouse subscription that produced this
+  // artifact. This is only set when the subscription has an alias
+  // configured, which is used to disambiguate multiple subscriptions to
+  // the same repository.
+  optional string alias = 9;
 }
 
 // GitDiscoveryResult represents the result of a Git discovery operation for a
@@ -862,6 +885,10 @@ message GitDiscoveryResult {
   //
   // +optional
   repeated DiscoveredCommit commits = 2;
+
+  // Alias is the alias of the GitSubscription that produced this result, if
+  // one was specified.
+  optional string alias = 3;
 }
 
 // GitHubWebhookReceiverConfig describes a webhook receiver that is compatible
@@ -966,6 +993,13 @@ message GitSubscription {
   // "strict" semver tag contains ALL of major, minor, and patch version components. Only has
   // effect when CommitSelectionStrategy is SemVer.
   optional bool strictSemvers = 14;
+
+  // Alias is an optional identifier for this subscription. When specified, it must be unique
+  // within the Warehouse and is used as the uniqueness key instead of the repository URL.
+  // This enables multiple subscriptions to the same repository with different configurations
+  // (e.g. different tag filters). When two or more subscriptions of the same type share the
+  // same repository URL, all of them MUST have a unique alias.
+  optional string alias = 15;
 }
 
 // GiteaWebhookReceiverConfig describes a webhook receiver that is compatible
@@ -1057,6 +1091,12 @@ message Image {
 
   // Annotations is a map of arbitrary metadata for the image.
   map<string, string> annotations = 5;
+
+  // Alias is the alias of the Warehouse subscription that produced this
+  // artifact. This is only set when the subscription has an alias
+  // configured, which is used to disambiguate multiple subscriptions to
+  // the same repository.
+  optional string alias = 6;
 }
 
 // ImageDiscoveryResult represents the result of an image discovery operation
@@ -1080,6 +1120,10 @@ message ImageDiscoveryResult {
   //
   // +optional
   repeated DiscoveredImageReference references = 3;
+
+  // Alias is the alias of the ImageSubscription that produced this result,
+  // if one was specified.
+  optional string alias = 4;
 }
 
 // ImageSubscription defines a subscription to a container image repository.
@@ -1151,6 +1195,13 @@ message ImageSubscription {
   // with short Git commit hashes, which could be mistaken for a semver string containing the
   // major version number only.
   optional bool strictSemvers = 12;
+
+  // Alias is an optional identifier for this subscription. When specified, it must be unique
+  // within the Warehouse and is used as the uniqueness key instead of the repository URL.
+  // This enables multiple subscriptions to the same repository with different configurations
+  // (e.g. different tag filters). When two or more subscriptions of the same type share the
+  // same repository URL, all of them MUST have a unique alias.
+  optional string alias = 13;
 }
 
 // IndexSelector defines selection criteria that match resources on the basis of

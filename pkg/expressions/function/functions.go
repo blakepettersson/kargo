@@ -596,8 +596,8 @@ func getCommitFromFreight(
 	freightRefs []kargoapi.FreightReference,
 ) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) == 0 || len(a) > 2 {
-			return nil, fmt.Errorf("expected 1-2 arguments, got %d", len(a))
+		if len(a) == 0 || len(a) > 3 {
+			return nil, fmt.Errorf("expected 1-3 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
@@ -605,13 +605,17 @@ func getCommitFromFreight(
 			return nil, fmt.Errorf("first argument must be string, got %T", a[0])
 		}
 
+		var alias string
 		var desiredOrigin *kargoapi.FreightOrigin
-		if len(a) == 2 {
-			origin, ok := a[1].(kargoapi.FreightOrigin)
-			if !ok {
-				return nil, fmt.Errorf("second argument must be FreightOrigin, got %T", a[1])
+		for _, arg := range a[1:] {
+			switch v := arg.(type) {
+			case string:
+				alias = v
+			case kargoapi.FreightOrigin:
+				desiredOrigin = &v
+			default:
+				return nil, fmt.Errorf("unexpected argument type %T", arg)
 			}
-			desiredOrigin = &origin
 		}
 
 		return freight.FindCommit(
@@ -622,20 +626,30 @@ func getCommitFromFreight(
 			desiredOrigin,
 			freightRefs,
 			repoURL,
+			alias,
 		)
 	}
 }
 
-// getCommitFromDiscoveredArtifacts returns a function that finds Git commits based on repository URL.
+// getCommitFromDiscoveredArtifacts returns a function that finds Git commits based on
+// repository URL and optional alias.
 func getCommitFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) != 1 {
-			return nil, fmt.Errorf("expected 1 argument, got %d", len(a))
+		if len(a) == 0 || len(a) > 2 {
+			return nil, fmt.Errorf("expected 1-2 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
 		if !ok {
 			return nil, fmt.Errorf("first argument must be string, got %T", a[0])
+		}
+
+		var alias string
+		if len(a) == 2 {
+			alias, ok = a[1].(string)
+			if !ok {
+				return nil, fmt.Errorf("second argument must be string, got %T", a[1])
+			}
 		}
 
 		if artifacts == nil {
@@ -645,6 +659,9 @@ func getCommitFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) e
 		repoURL = urls.NormalizeGit(repoURL)
 		for _, ca := range artifacts.Git {
 			if urls.NormalizeGit(ca.RepoURL) != repoURL {
+				continue
+			}
+			if alias != "" && ca.Alias != alias {
 				continue
 			}
 			if len(ca.Commits) > 0 {
@@ -668,8 +685,8 @@ func getImageFromFreight(
 	freightRefs []kargoapi.FreightReference,
 ) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) == 0 || len(a) > 2 {
-			return nil, fmt.Errorf("expected 1-2 arguments, got %d", len(a))
+		if len(a) == 0 || len(a) > 3 {
+			return nil, fmt.Errorf("expected 1-3 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
@@ -677,13 +694,17 @@ func getImageFromFreight(
 			return nil, fmt.Errorf("first argument must be string, got %T", a[0])
 		}
 
+		var alias string
 		var desiredOrigin *kargoapi.FreightOrigin
-		if len(a) == 2 {
-			origin, ok := a[1].(kargoapi.FreightOrigin)
-			if !ok {
-				return nil, fmt.Errorf("second argument must be FreightOrigin, got %T", a[1])
+		for _, arg := range a[1:] {
+			switch v := arg.(type) {
+			case string:
+				alias = v
+			case kargoapi.FreightOrigin:
+				desiredOrigin = &v
+			default:
+				return nil, fmt.Errorf("unexpected argument type %T", arg)
 			}
-			desiredOrigin = &origin
 		}
 
 		return freight.FindImage(
@@ -694,20 +715,30 @@ func getImageFromFreight(
 			desiredOrigin,
 			freightRefs,
 			repoURL,
+			alias,
 		)
 	}
 }
 
-// getImageFromDiscoveredArtifacts returns a function that finds the latest container image based on repository URL.
+// getImageFromDiscoveredArtifacts returns a function that finds the latest container image
+// based on repository URL and optional alias.
 func getImageFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) != 1 {
-			return nil, fmt.Errorf("expected 1 argument, got %d", len(a))
+		if len(a) == 0 || len(a) > 2 {
+			return nil, fmt.Errorf("expected 1-2 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
 		if !ok {
 			return nil, fmt.Errorf("first argument must be string, got %T", a[0])
+		}
+
+		var alias string
+		if len(a) == 2 {
+			alias, ok = a[1].(string)
+			if !ok {
+				return nil, fmt.Errorf("second argument must be string, got %T", a[1])
+			}
 		}
 
 		if artifacts == nil {
@@ -717,6 +748,9 @@ func getImageFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) ex
 		repoURL = urls.NormalizeImage(repoURL)
 		for _, ia := range artifacts.Images {
 			if urls.NormalizeImage(ia.RepoURL) != repoURL {
+				continue
+			}
+			if alias != "" && ia.Alias != alias {
 				continue
 			}
 			if len(ia.References) > 0 {
@@ -740,8 +774,8 @@ func getChartFromFreight(
 	freightRefs []kargoapi.FreightReference,
 ) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) == 0 || len(a) > 3 {
-			return nil, fmt.Errorf("expected 1-3 arguments, got %d", len(a))
+		if len(a) == 0 || len(a) > 4 {
+			return nil, fmt.Errorf("expected 1-4 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
@@ -749,28 +783,29 @@ func getChartFromFreight(
 			return nil, fmt.Errorf("first argument must be string, got %T", a[0])
 		}
 
+		// Remaining args are parsed positionally: string args fill chartName
+		// then alias in order, and a FreightOrigin can appear anywhere.
 		var chartName string
+		var alias string
 		var desiredOrigin *kargoapi.FreightOrigin
-
-		if len(a) >= 2 {
-			if name, ok := a[1].(string); ok {
-				chartName = name
-			} else if origin, ok := a[1].(kargoapi.FreightOrigin); ok {
-				desiredOrigin = &origin
-			} else {
-				return nil, fmt.Errorf("second argument must be string or FreightOrigin, got %T", a[1])
+		var stringArgs int
+		for _, arg := range a[1:] {
+			switch v := arg.(type) {
+			case string:
+				switch stringArgs {
+				case 0:
+					chartName = v
+				case 1:
+					alias = v
+				default:
+					return nil, fmt.Errorf("too many string arguments")
+				}
+				stringArgs++
+			case kargoapi.FreightOrigin:
+				desiredOrigin = &v
+			default:
+				return nil, fmt.Errorf("unexpected argument type %T", arg)
 			}
-		}
-
-		if len(a) == 3 {
-			if chartName == "" {
-				return nil, fmt.Errorf("when using three arguments, second argument must be string, got %T", a[1])
-			}
-			origin, ok := a[2].(kargoapi.FreightOrigin)
-			if !ok {
-				return nil, fmt.Errorf("third argument must be FreightOrigin, got %T", a[2])
-			}
-			desiredOrigin = &origin
 		}
 
 		return freight.FindChart(
@@ -782,15 +817,17 @@ func getChartFromFreight(
 			freightRefs,
 			repoURL,
 			chartName,
+			alias,
 		)
 	}
 }
 
-// getChartFromDiscoveredArtifacts returns a function that finds the latest Helm chart based on repository URL.
+// getChartFromDiscoveredArtifacts returns a function that finds the latest Helm chart based
+// on repository URL, optional chart name, and optional alias.
 func getChartFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) exprFn {
 	return func(a ...any) (any, error) {
-		if len(a) == 0 || len(a) > 2 {
-			return nil, fmt.Errorf("expected 1-2 arguments, got %d", len(a))
+		if len(a) == 0 || len(a) > 3 {
+			return nil, fmt.Errorf("expected 1-3 arguments, got %d", len(a))
 		}
 
 		repoURL, ok := a[0].(string)
@@ -799,10 +836,16 @@ func getChartFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) ex
 		}
 
 		var chartName string
-		if len(a) == 2 {
-			chartName, ok = a[1].(string)
+		var alias string
+		for i, arg := range a[1:] {
+			s, ok := arg.(string)
 			if !ok {
-				return nil, fmt.Errorf("second argument must be string, got %T", a[1])
+				return nil, fmt.Errorf("argument %d must be string, got %T", i+2, arg)
+			}
+			if i == 0 {
+				chartName = s
+			} else {
+				alias = s
 			}
 		}
 
@@ -815,11 +858,15 @@ func getChartFromDiscoveredArtifacts(artifacts *kargoapi.DiscoveredArtifacts) ex
 			if urls.NormalizeChart(ca.RepoURL) != repoURL || (ca.Name != chartName && chartName != "") {
 				continue
 			}
+			if alias != "" && ca.Alias != alias {
+				continue
+			}
 			if len(ca.Versions) > 0 {
 				return kargoapi.Chart{
 					RepoURL: repoURL,
 					Name:    ca.Name,
 					Version: ca.Versions[0],
+					Alias:   ca.Alias,
 				}, nil
 			}
 		}
